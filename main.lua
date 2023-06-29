@@ -1,56 +1,48 @@
 local Tetros = {}
 Tetros[1] = {{
-    {0,0,0,0},
-    {0,0,0,0},
     {1,1,1,1},
-    {0,0,0,0}
     },
     {
-    {0,0,1,0},
-    {0,0,1,0},
-    {0,0,1,0},
-    {0,0,1,0}       
+    {1},
+    {1},
+    {1},
+    {1}
     }
 }
 Tetros[1].color = {0.16, 0.67, 0.88}
 Tetros[2] = { {
-    {0,0,0,0},
-    {0,1,1,0},
-    {0,1,1,0},
-    {0,0,0,0}
+    {1,1},
+    {1,1},
     } }
 Tetros[2].color = {0.99, 0.88, 0}
 Tetros[3] = {
     {
-    {0,1,0},
-    {0,1,0},
-    {1,1,0},
+    {0,1},
+    {0,1},
+    {1,1},
     },
     {
     {1,0,0},
     {1,1,1},
-    {0,0,0},
     },
     {
-    {0,1,1},
-    {0,1,0},
-    {0,1,0},
+    {1,1},
+    {1,0},
+    {1,0},
     },
     {
-    {0,0,0},
     {1,1,1},
     {0,0,1},
     } }
 Tetros[3].color = {0, 0.35, 0.61}
 Tetros[4] = { {
-    {0,0,0},
     {0,1,1},
     {1,1,0},
     },
     {
-    {0,1,0},
-    {0,1,1},
-    {0,0,1},
+    {1,0},
+    {1,1},
+    {0,1},
     },
 }
 Tetros[4].color = {0.3,0.71,0.28}
@@ -58,54 +50,49 @@ Tetros[5] = {
     {
         {1,1,0},
         {0,1,1},
-        {0,0,0},
         },
         {
-        {0,1,0},
-        {1,1,0},
-        {1,0,0},
+        {0,1},
+        {1,1},
+        {1,0},
         }
 }
 Tetros[5].color = { 0.93, 0.15, 0.2}
 Tetros[6] = { {
-    {0,0,0},
     {1,1,1},
     {0,1,0},
     },
     {
-    {0,1,0},
-    {0,1,1},
-    {0,1,0},
+    {1,0},
+    {1,1},
+    {1,0},
     },
     {
     {0,1,0},
     {1,1,1},
-    {0,0,0},
     },
     {
-    {0,1,0},
-    {1,1,0},
-    {0,1,0},
+    {0,1},
+    {1,1},
+    {0,1},
     } }
 Tetros[6].color = {0.57,0.16,0.54}
 Tetros[7] = {
     {
-        {0,1,0},
-        {0,1,0},
-        {0,1,1}
+        {1,0},
+        {1,0},
+        {1,1}
     },
     {
         {0,0,1},
         {1,1,1},
-        {0,0,0}
     },
     {
-        {1,1,0},
-        {0,1,0},
-        {0,1,0}
+        {1,1},
+        {0,1},
+        {0,1}
     },
     {
-        {0,0,0},
         {1,1,1},
         {1,0,0}
     }
@@ -120,6 +107,7 @@ currentTetros.position = { x = 0 , y = 0}
 local Grid = {}
 Grid.width = 10
 Grid.height = 20
+Grid.cellSize = 0
 Grid.cells = {}
 
 local speed = 1
@@ -139,7 +127,7 @@ end
 
 function InitGrid()
     Grid.cellSize = screen_height / Grid.height
-    Grid.offsetX = (screen_width / 2 ) - ((Grid.cellSize * Grid.width ) / 2)
+    Grid.offsetX = (screen_width / 2 ) - (Grid.cellSize * Grid.width  / 2)
     Grid.offsetY = 0
 
     for l = 1, Grid.height do
@@ -182,7 +170,7 @@ end
 function collide(pX, pY)
     local shape = Tetros[currentTetros.shape][currentTetros.rotation]
     for l = 1, #shape do
-        for c = 1, #shape do
+        for c = 1, #shape[l] do
             local col = (c-1) + pX
             local lig = (l-1) + pY
             if col <= 0 or col > Grid.width then
@@ -219,9 +207,7 @@ function love.draw()
     
     local Shape = Tetros[currentTetros.shape][currentTetros.rotation]
     DrawGrid()
-    taille = 0
-    for _ in pairs(Shape) do taille = taille + 1 end
-    love.graphics.print('Shape : ' ..tostring(taille))
+    taille = #Shape[1]
     DrawTetros(Shape, currentTetros.position.x, currentTetros.position.y)
     
 end
@@ -239,7 +225,7 @@ function love.keypressed(key)
     end
     
     if key == 'down' then
-        if not collide(currentTetros.position.x - 1, currentTetros.position.y + 1) then
+        if not collide(currentTetros.position.x, currentTetros.position.y + 1) then
             currentTetros.position.y = currentTetros.position.y + 1
         end
     end
@@ -250,13 +236,13 @@ function love.keypressed(key)
     end
 
     if key == 'left' then
-        if not collide(currentTetros.position.x - 1, currentTetros.position.y - 1) then
-            currentTetros.position.x = currentTetros.position.x - 1 
+        if not collide(currentTetros.position.x - 1, currentTetros.position.y) then
+            currentTetros.position.x = currentTetros.position.x - 1
         end
     end
 
     if key == 'right' then
-        if not collide(currentTetros.position.x + 1, currentTetros.position.y + 1) then
+        if not collide(currentTetros.position.x + 1, currentTetros.position.y) then
             currentTetros.position.x = currentTetros.position.x + 1
         end
     end
