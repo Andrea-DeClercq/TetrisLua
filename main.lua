@@ -111,8 +111,11 @@ Tetros[7] = {
     }
 }
 Tetros[7].color = { 0.97, 0.58, 0.13}
-local currrentRotation = 1
-local currentTetros = 1
+
+local currentTetros = {}
+currentTetros.shape = 1
+currentTetros.rotation = 1
+currentTetros.position = { x = 0 , y = 0}
 
 local Grid = {}
 Grid.width = 10
@@ -120,7 +123,10 @@ Grid.height = 20
 Grid.cells = {}
 
 function SpawnTetros()
-    currentTetros = math.random(1, #Tetros)
+    currentTetros.shape = math.random(1, #Tetros)
+    -- currentTetros.rotation = math.random(1, #Tetros)
+    currentTetros.position.x = Grid.offsetX
+    currentTetros.position.y = Grid.offsetY
 end
 
 function InitGame()
@@ -154,15 +160,15 @@ function DrawGrid()
     end
 end
 
-function DrawTetros(pShape)
+function DrawTetros(pShape, pX, pY, pT)
     for l = 1, #pShape do
         for c = 1, #pShape[l] do
             if pShape[l][c] == 1 then
                 local x = (c-1)*Grid.cellSize
                 local y = (l-1)*Grid.cellSize
-                x = x + Grid.offsetX + (Grid.cellSize*3)
-                y = y + Grid.offsetY
-                love.graphics.setColor(Tetros[currentTetros].color)
+                x = pX + x + (Grid.cellSize*(math.floor(Grid.width/2)-(pT-2)))
+                y = pY + y
+                love.graphics.setColor(Tetros[currentTetros.shape].color)
                 love.graphics.rectangle('fill',x,y,Grid.cellSize - 1,Grid.cellSize - 1)
             end
         end
@@ -183,20 +189,24 @@ end
 
 function love.draw()
     
-    local Shape = Tetros[currentTetros][currrentRotation]
+    local Shape = Tetros[currentTetros.shape][currentTetros.rotation]
     DrawGrid()
-    DrawTetros(Shape)
+    taille = 0
+    for _ in pairs(Shape) do taille = taille + 1 end
+    love.graphics.print('Shape : ' ..tostring(taille))
+    DrawTetros(Shape, currentTetros.position.x, currentTetros.position.y, taille)
+    
 end
 
 function love.keypressed(key)
     if key == 't' then
-        currentTetros = currentTetros + 1
-        if currentTetros > #Tetros then currentTetros = 1 end
-        currrentRotation = 1
+        currentTetros.shape = currentTetros.shape + 1
+        if currentTetros.shape > #Tetros then currentTetros.shape = 1 end
+        currentTetros.rotation = 1
     end
 
     if key == 'r' then
-        currrentRotation = currrentRotation + 1
-        if currrentRotation > #Tetros[currentTetros] then currrentRotation = 1 end
+        currentTetros.rotation = currentTetros.rotation + 1
+        if currentTetros.rotation > #Tetros[currentTetros.shape] then currentTetros.rotation = 1 end
     end
 end
