@@ -124,10 +124,24 @@ function InitGrid()
     Grid.offsetX = (screen_width / 2 ) - ((Grid.cellSize * Grid.width ) / 2)
     Grid.offsetY = 0
 
-    for l = 1, #Grid.height do
+    for l = 1, Grid.height do
         Grid.cells[l] = {}
-        for c = 1, #Grid.width do
+        for c = 1, Grid.width do
             Grid.cells[l][c] = 0
+        end
+    end
+end
+
+function DrawGrid()
+    love.graphics.setColor(1,1,1,0.25)
+    local x,y
+    for l = 1, Grid.height do
+        for c = 1, Grid.width do
+            x = (c-1)*Grid.cellSize
+            y = (l-1)*Grid.cellSize
+            x = x + Grid.offsetX
+            y = y + Grid.offsetY
+            love.graphics.rectangle('line',x,y, Grid.cellSize-1, Grid.cellSize-1)
         end
     end
 end
@@ -135,6 +149,7 @@ end
 function love.load()
     screen_width = love.graphics.getWidth()
     screen_height = love.graphics.getHeight()
+    InitGrid()
 end
 
 function love.update(dt)
@@ -153,6 +168,7 @@ function love.draw()
             end
         end
     end
+    DrawGrid()
 end
 
 function love.keypressed(key)
