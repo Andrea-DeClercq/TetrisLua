@@ -158,6 +158,7 @@ end
 
 function love.draw()
     local Shape = Tetros[currentTetros][currrentRotation]
+    DrawGrid()
     for l = 1, #Shape do
         for c = 1, #Shape[l] do
             if Shape[l][c] == 1 then
@@ -168,7 +169,6 @@ function love.draw()
             end
         end
     end
-    DrawGrid()
 end
 
 function love.keypressed(key)
