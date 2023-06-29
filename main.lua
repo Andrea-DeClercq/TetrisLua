@@ -119,6 +119,14 @@ Grid.width = 10
 Grid.height = 20
 Grid.cells = {}
 
+function SpawnTetros()
+    currentTetros = math.random(1, #Tetros)
+end
+
+function InitGame()
+    
+end
+
 function InitGrid()
     Grid.cellSize = screen_height / Grid.height
     Grid.offsetX = (screen_width / 2 ) - ((Grid.cellSize * Grid.width ) / 2)
@@ -146,10 +154,27 @@ function DrawGrid()
     end
 end
 
+function DrawTetros(pShape)
+    for l = 1, #pShape do
+        for c = 1, #pShape[l] do
+            if pShape[l][c] == 1 then
+                local x = (c-1)*Grid.cellSize
+                local y = (l-1)*Grid.cellSize
+                x = x + Grid.offsetX + (Grid.cellSize*3)
+                y = y + Grid.offsetY
+                love.graphics.setColor(Tetros[currentTetros].color)
+                love.graphics.rectangle('fill',x,y,Grid.cellSize - 1,Grid.cellSize - 1)
+            end
+        end
+    end
+end
+
 function love.load()
+    math.randomseed(os.time())
     screen_width = love.graphics.getWidth()
     screen_height = love.graphics.getHeight()
     InitGrid()
+    SpawnTetros()
 end
 
 function love.update(dt)
@@ -157,18 +182,10 @@ function love.update(dt)
 end
 
 function love.draw()
+    
     local Shape = Tetros[currentTetros][currrentRotation]
     DrawGrid()
-    for l = 1, #Shape do
-        for c = 1, #Shape[l] do
-            if Shape[l][c] == 1 then
-                local x = (c-1)*32
-                local y = (l-1)*32
-                love.graphics.setColor(Tetros[currentTetros].color)
-                love.graphics.rectangle('fill',x,y,31,31)
-            end
-        end
-    end
+    DrawTetros(Shape)
 end
 
 function love.keypressed(key)
