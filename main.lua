@@ -122,11 +122,15 @@ Grid.width = 10
 Grid.height = 20
 Grid.cells = {}
 
+local speed = 1
+local gameTimer = 0
+
 function SpawnTetros()
     currentTetros.shape = math.random(1, #Tetros)
-    -- currentTetros.rotation = math.random(1, #Tetros)
-    currentTetros.position.x = Grid.offsetX
-    currentTetros.position.y = Grid.offsetY
+    currentTetros.rotation = math.random(1, #Tetros[currentTetros.shape])
+    currentTetros.position.x = math.floor(Grid.width / 2 - 1)
+    currentTetros.position.y = 1
+    gameTimer = speed
 end
 
 function InitGame()
@@ -160,19 +164,37 @@ function DrawGrid()
     end
 end
 
-function DrawTetros(pShape, pX, pY, pT)
+function DrawTetros(pShape, pX, pY)
     for l = 1, #pShape do
         for c = 1, #pShape[l] do
             if pShape[l][c] == 1 then
                 local x = (c-1)*Grid.cellSize
                 local y = (l-1)*Grid.cellSize
-                x = pX + x + (Grid.cellSize*(math.floor(Grid.width/2)-(pT-2)))
-                y = pY + y
+                x = x + Grid.offsetX + (pX - 1) * Grid.cellSize
+                y = y + (pY - 1) * Grid.cellSize
                 love.graphics.setColor(Tetros[currentTetros.shape].color)
                 love.graphics.rectangle('fill',x,y,Grid.cellSize - 1,Grid.cellSize - 1)
             end
         end
     end
+end
+
+function collide(pX, pY)
+    local shape = Tetros[currentTetros.shape][currentTetros.rotation]
+    for l = 1, #shape do
+        for c = 1, #shape do
+            local col = (c-1) + pX
+            local lig = (l-1) + pY
+            if col <= 0 or col > Grid.width then
+                return true
+            end
+
+            if lig > Grid.height then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 function love.load()
@@ -184,7 +206,13 @@ function love.load()
 end
 
 function love.update(dt)
-    
+    gameTimer = gameTimer - dt
+    if gameTimer < 0 then
+        if not collide(currentTetros.position.x - 1, currentTetros.position.y + 1) then
+            currentTetros.position.y = currentTetros.position.y + 1
+        end
+        gameTimer = speed
+    end
 end
 
 function love.draw()
@@ -194,7 +222,7 @@ function love.draw()
     taille = 0
     for _ in pairs(Shape) do taille = taille + 1 end
     love.graphics.print('Shape : ' ..tostring(taille))
-    DrawTetros(Shape, currentTetros.position.x, currentTetros.position.y, taille)
+    DrawTetros(Shape, currentTetros.position.x, currentTetros.position.y)
     
 end
 
@@ -208,5 +236,28 @@ function love.keypressed(key)
     if key == 'r' then
         currentTetros.rotation = currentTetros.rotation + 1
         if currentTetros.rotation > #Tetros[currentTetros.shape] then currentTetros.rotation = 1 end
+    end
+    
+    if key == 'down' then
+        if not collide(currentTetros.position.x - 1, currentTetros.position.y + 1) then
+            currentTetros.position.y = currentTetros.position.y + 1
+        end
+    end
+
+    if key == 'up' then
+        currentTetros.rotation = currentTetros.rotation + 1
+        if currentTetros.rotation > #Tetros[currentTetros.shape] then currentTetros.rotation = 1 end
+    end
+
+    if key == 'left' then
+        if not collide(currentTetros.position.x - 1, currentTetros.position.y - 1) then
+            currentTetros.position.x = currentTetros.position.x - 1 
+        end
+    end
+
+    if key == 'right' then
+        if not collide(currentTetros.position.x + 1, currentTetros.position.y + 1) then
+            currentTetros.position.x = currentTetros.position.x + 1
+        end
     end
 end
