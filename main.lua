@@ -114,6 +114,24 @@ Tetros[7].color = { 0.97, 0.58, 0.13}
 local currrentRotation = 1
 local currentTetros = 1
 
+local Grid = {}
+Grid.width = 10
+Grid.height = 20
+Grid.cells = {}
+
+function InitGrid()
+    Grid.cellSize = screen_height / Grid.height
+    Grid.offsetX = (screen_width / 2 ) - ((Grid.cellSize * Grid.width ) / 2)
+    Grid.offsetY = 0
+
+    for l = 1, #Grid.height do
+        Grid.cells[l] = {}
+        for c = 1, #Grid.width do
+            Grid.cells[l][c] = 0
+        end
+    end
+end
+
 function love.load()
     screen_width = love.graphics.getWidth()
     screen_height = love.graphics.getHeight()
